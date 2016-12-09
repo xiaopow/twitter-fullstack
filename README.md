@@ -1,3 +1,7 @@
-# Rails App Template
+# Twitter Project
 
-1. New Rails app called **railsapp**: `rails new railsapp -B -T --database=postgresql --skip-turbolinks`
+To start server:
+
+```
+rails s
+```
