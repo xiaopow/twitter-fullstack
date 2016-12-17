@@ -2,16 +2,16 @@ Rails.application.routes.draw do
   root 'homepage#index'
   get 'user' => 'user#index'
 
-  namespace :api do
-    namespace :v1 do
-      # USERS
+  # USERS
+  resources :users
 
-      # SESSIONS
+  # SESSIONS
+  resources :sessions
 
-      # TWEETS
+  # TWEETS
+  resources :tweets
 
-    end
-  end
+  get 'authenticated' => 'sessions#authenticated'
 
   # Redirect all other paths to index page, which will be taken over by AngularJS
   get '*path'    => 'homepage#index'

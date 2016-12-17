@@ -68,7 +68,7 @@ function logoutUser(callback) {
 
 //------------------ Authenticate ---------------------
 
-function authenticate(sucessCB,errorCB) {
+function authenticate(successCB,errorCB) {
   var newRequest = new Request();
   newRequest['type'] = 'GET';
   newRequest['url'] = 'authenticated';
@@ -112,7 +112,7 @@ function getAllTweets(callback) {
   newRequest['type'] = 'GET';
   newRequest['url'] = 'tweets';
   newRequest['success'] = function(response){
-    return callback(response);
+    return callback(response.tweets);
   };
 
   $.ajax(newRequest);
