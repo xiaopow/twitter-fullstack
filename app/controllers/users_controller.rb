@@ -4,6 +4,10 @@ class UsersController < ApplicationController
 
     if @user.save
       render 'users/create'
+    else
+      render json: {
+        success: false
+      }
     end
   end
 
