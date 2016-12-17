@@ -1,6 +1,6 @@
 class TweetsController < ApplicationController
   def index
-    @tweets = Tweet.all
+    @tweets = Tweet.all.order(created_at: :desc)
     render 'tweets/index'
   end
 
@@ -19,8 +19,10 @@ class TweetsController < ApplicationController
   def destroy
     token = cookies.signed[:twitter_session_token]
     session = Session.find_by(token: token)
-    user = session.user
 
+    return render json: { success: false } unless session
+
+    user = session.user
     tweet = Tweet.find_by(id: params[:id])
 
     if tweet and tweet.user == user and tweet.destroy
