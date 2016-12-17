@@ -4,7 +4,7 @@ RSpec.describe Tweet, type: :model do
   describe '.create' do
     it 'must belong to a user' do
       expect {
-        Tweet.create!
+        Tweet.create!(message: 'test')
       }.to raise_error(ActiveRecord::RecordInvalid)
     end
 

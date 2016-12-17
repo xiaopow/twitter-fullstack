@@ -3,13 +3,19 @@ Rails.application.routes.draw do
   get 'user' => 'user#index'
 
   # USERS
-  resources :users
+  post '/users' => 'users#create'
 
   # SESSIONS
-  resources :sessions
+  post '/sessions' => 'sessions#create'
+  get '/authenticated' => 'sessions#authenticated'
+  delete '/sessions' => 'sessions#destroy'
 
   # TWEETS
-  resources :tweets
+  post '/tweets' => 'tweets#create'
+  get '/tweets' => 'tweets#index'
+  delete '/tweets/:id' => 'tweets#destroy'
+  get '/users/:username/:tweets' => 'tweets#index_by_user'
+  get '/tweets/search/:keyword' => 'tweets#search'
 
   get 'authenticated' => 'sessions#authenticated'
 

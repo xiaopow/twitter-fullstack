@@ -16,6 +16,38 @@ class TweetsController < ApplicationController
     end
   end
 
+  def destroy
+    token = cookies.signed[:twitter_session_token]
+    session = Session.find_by(token: token)
+    user = session.user
+
+    tweet = Tweet.find_by(id: params[:id])
+
+    if tweet and tweet.user == user and tweet.destroy
+      render json: {
+        success: true
+      }
+    else
+      render json: {
+        success: false
+      }
+    end
+  end
+
+  def index_by_user
+    user = User.find_by(username: params[:username])
+
+    if user
+      @tweets = user.tweets
+      render 'tweets/index'
+    end
+  end
+
+  def search
+    @tweets = Tweet.basic_search(message: params[:keyword])
+    render 'tweets/index'
+  end
+
   private
 
     def tweet_params

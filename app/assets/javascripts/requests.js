@@ -139,7 +139,7 @@ function getUserTweets(username, callback) {
   newRequest['url'] = 'users/' + username + '/tweets';
   newRequest['success'] = function(response){
     console.log(response);
-    return callback(response);
+    return callback(response.tweets);
   };
 
   $.ajax(newRequest);
@@ -165,10 +165,10 @@ function deleteOneTweet(id, callback) {
 function searchTweets(keyword, callback) {
   var newRequest = new Request();
   newRequest['type'] = "GET";
-  newRequest['url'] = "tweets/search/"+keyword; 
+  newRequest['url'] = "tweets/search/"+keyword;
   newRequest["success"] = function(response){
     console.log(response);
-    return callback(response);
+    return callback(response.tweets);
   };
 
   $.ajax(newRequest);

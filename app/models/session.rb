@@ -1,7 +1,9 @@
 class Session < ApplicationRecord
   belongs_to :user
 
-  before_create :generate_session_token
+  validates :user, presence: true
+
+  before_validation :generate_session_token
 
   private
 
