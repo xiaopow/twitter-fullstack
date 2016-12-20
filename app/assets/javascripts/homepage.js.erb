@@ -5,7 +5,7 @@ $(".homepage.index").ready(function(){
   function authenRedirect() {
     authenticate(function(response) {
       if(response.authenticated) {
-        window.location.replace("/user");
+        window.location.replace("/feeds");
       }
     });
   };
