@@ -19,5 +19,15 @@ RSpec.describe Tweet, type: :model do
         FactoryGirl.create(:tweet, message: 'c' * 141)
       }.to raise_error(ActiveRecord::RecordInvalid)
     end
+
+    it 'can have an image' do
+      user = FactoryGirl.create(:user)
+      tweet = FactoryGirl.create(:tweet, user: user, message: 'ok', image: File.new("#{Rails.root}/spec/fixtures/files/test.png"))
+
+      expect(tweet.image_content_type).to eq("image/png")
+      expect(tweet.image_file_name).not_to be_nil
+      expect(tweet.image_file_size).not_to be_nil
+      expect(tweet.image_updated_at).not_to be_nil
+    end
   end
 end

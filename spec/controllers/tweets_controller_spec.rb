@@ -3,6 +3,44 @@ require 'rails_helper'
 RSpec.describe TweetsController, type: :controller do
   render_views
 
+  describe 'POST /tweets' do
+    it 'renders new tweet object' do
+      user = FactoryGirl.create(:user)
+      session = user.sessions.create
+      @request.cookie_jar.signed['twitter_session_token'] = session.token
+
+      post :create, params: {
+        tweet: {
+          message: 'Test Message'
+        }
+      }
+
+      expect(response.body).to eq({
+        tweet: {
+          username: user.username,
+          message: 'Test Message',
+          image: '/images/original/missing.png'
+        }
+      }.to_json)
+    end
+
+    it 'OK with image attachments' do
+      user = FactoryGirl.create(:user)
+      session = user.sessions.create
+      @request.cookie_jar.signed['twitter_session_token'] = session.token
+
+      post :create, params: {
+        tweet: {
+          message: 'Test Message',
+          image: fixture_file_upload('files/test.png')
+        }
+      }
+
+      expect(JSON.parse(response.body)['tweet']['message']).to eq('Test Message')
+      expect(JSON.parse(response.body)['tweet']['image']).to include('/system/tweets/images//original/test.png')
+    end
+  end
+
   describe 'GET /tweets' do
     it 'renders all tweets object' do
       user = FactoryGirl.create(:user)
