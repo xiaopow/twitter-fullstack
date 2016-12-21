@@ -65,7 +65,7 @@
       <div class="trends col-xs-12">
         <div class="col-xs-12">
           <div class="trends-header">
-            <span>Trends</span><span> &#183; </span><small><a href="">Change</a></small>      
+            <span>Trends</span><span> &#183; </span><small><a href="">Change</a></small>
           </div>
           <ul class="trends-list">
             <li><a href="#">#Hongkong</a></li>
@@ -81,6 +81,9 @@
       <div class="col-xs-12 post-tweet-box">
         <textarea type="text" class="form-control post-input" rows="3" placeholder="What's happening?"></textarea>
         <div class="pull-right">
+          <label id="upload-image-btn" for="image-select">Upload image</label>
+          <img id="image-preview" src="" alt="image preview" style="display: none;" />
+          <input type="file" id="image-select" name="image" accept="image/*" />
           <span class="post-char-counter">140</span>
           <button class="btn btn-primary" disabled id="post-tweet-btn">Tweet</button>
         </div>

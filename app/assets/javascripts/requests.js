@@ -87,19 +87,29 @@ function authenticate(successCB,errorCB) {
 //---------------------- Tweets -----------------------
 
 //------------------- Post a Tweet --------------------
-function postTweet(msg, callback) {
-  var newRequest = new Request();
+function postTweet(msg, image, callback) {
+  var formData = new FormData();
+  if (msg) {
+    formData.append('tweet[message]', msg);
+  }
+  if (image) {
+    formData.append('tweet[image]', image, image.name);
+  }
+  var newRequest = {};
   newRequest['type'] = 'POST';
   newRequest['url'] = 'tweets';
+  newRequest['cache'] = false;
+  newRequest['contentType'] = false;
+  newRequest['processData'] = false;
   newRequest['xhrFields'] = { 'withCredentials': true };
-  newRequest['data'] = {
-    'tweet': {
-      'message': msg
-    }
-  };
+  newRequest['data'] = formData;
   newRequest['success'] = function(response){
     console.log(response);
     return callback({'success': true});
+  };
+  newRequest['error'] = function(request, error){
+    console.log(request);
+    console.log(error);
   };
 
   $.ajax(newRequest);

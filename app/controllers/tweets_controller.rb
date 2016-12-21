@@ -8,7 +8,6 @@ class TweetsController < ApplicationController
     token = cookies.signed[:twitter_session_token]
     session = Session.find_by(token: token)
     user = session.user
-
     @tweet = user.tweets.new(tweet_params)
 
     if @tweet.save
@@ -53,6 +52,6 @@ class TweetsController < ApplicationController
   private
 
     def tweet_params
-      params.require(:tweet).permit(:message, :image)
+      params.require(:tweet).permit(:message)
     end
 end

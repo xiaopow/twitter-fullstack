@@ -54,10 +54,42 @@ $(".feeds.index").ready(function(){
     charCount();
   });
 
+  //------------------- Image Preview Handling --------------------
+
+  function readURL(input) {
+    if (input.files && input.files[0]) {
+      var reader = new FileReader();
+
+      reader.onload = function (e) {
+        $('#image-preview').attr('src', e.target.result);
+        $('#image-preview').show();
+      }
+
+      reader.readAsDataURL(input.files[0]);
+    }
+  }
+
+  $("#image-select").change(function(){
+    readURL(this);
+  });
+
+  $(document).on('click', '#image-preview', function() {
+    $('#image-select').val('');
+    $('#image-preview').attr('src', '#');
+    $('#image-preview').hide();
+  })
+
+  //------------------- Post Tweet --------------------
+
   $(document).on('click', '#post-tweet-btn', function() {
-    postTweet($('.post-input').val(), function(result) {
+    var imageSelect = document.getElementById('image-select');
+    var image = imageSelect.files[0];
+    postTweet($('.post-input').val(), image, function(result) {
       if(result.success) {
         $('.post-input').val('');
+        imageSelect.value = '';
+        $('#image-preview').attr('src', '#');
+        $('#image-preview').hide();
         getTweetsAndPost();
         charCount();
         getUserTweets(currentUser, function(response) {
@@ -67,27 +99,37 @@ $(".feeds.index").ready(function(){
     });
   });
 
+  //--------------- Get Tweets ----------------
+
   function getTweetsAndPost() {
     getAllTweets(function(tweets){
       $('.feed').text('');
       $.each(tweets, function(index){
         if(tweets[index]['username'] === currentUser) {
-          $('.feed').prepend(
-            '<div class="tweet col-xs-12"> \
+          var html = '<div class="tweet col-xs-12"> \
             <a class="tweet-username" href="#">'+tweets[index]['username']+'</a> \
             <a class="tweet-screenName" href="#">@'+tweets[index]['username']+'</a> \
-            <p>'+tweets[index]['message']+'</p> \
-            <a class="delete-tweet" id="'+tweets[index]['id']+'" href="#">Delete</a> \
+            <a class="delete-tweet" id="'+tweets[index]['id']+'" href="#">Delete</a>'
+
+          if (tweets[index]['image'] !== "/images/original/missing.png") {
+            html += '<img src="' + tweets[index]['image'] + '" class="img img-responsive">'
+          }
+
+          html += '<p>'+tweets[index]['message']+'</p> \
             </div>'
-          );
+          $('.feed').prepend(html);
         } else {
-          $('.feed').prepend(
-            '<div class="tweet col-xs-12"> \
+          var html = '<div class="tweet col-xs-12"> \
             <a class="tweet-username" href="#">'+tweets[index]['username']+'</a> \
-            <a class="tweet-screenName" href="#">@'+tweets[index]['username']+'</a> \
-            <p>'+tweets[index]['message']+'</p> \
+            <a class="tweet-screenName" href="#">@'+tweets[index]['username']+'</a>'
+
+          if (tweets[index]['image'] !== "/images/original/missing.png") {
+            html += '<img src="' + tweets[index]['image'] + '" class="img img-responsive">'
+          }
+
+          html += '<p>'+tweets[index]['message']+'</p> \
             </div>'
-          );
+          $('.feed').prepend(html);
         }
       });
     });
