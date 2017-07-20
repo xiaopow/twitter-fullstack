@@ -54,11 +54,13 @@ RSpec.describe TweetsController, type: :controller do
           {
             id: Tweet.order(created_at: :desc)[0].id,
             username: user.username,
-            message: 'Test Message'
+            message: 'Test Message',
+            image: '/images/original/missing.png'
           }, {
             id: Tweet.order(created_at: :desc)[1].id,
             username: user.username,
-            message: 'Test Message'
+            message: 'Test Message',
+            image: '/images/original/missing.png'
           }
         ]
       }.to_json)
@@ -105,7 +107,8 @@ RSpec.describe TweetsController, type: :controller do
           {
             id: tweet_1.id,
             username: user_1.username,
-            message: 'Test Message'
+            message: 'Test Message',
+            image: '/images/original/missing.png'
           }
         ]
       }.to_json)
@@ -126,7 +129,8 @@ RSpec.describe TweetsController, type: :controller do
           {
             id: tweet_3.id,
             username: user.username,
-            message: '123'
+            message: '123',
+            image: '/images/original/missing.png'
           }
         ]
       }.to_json)
