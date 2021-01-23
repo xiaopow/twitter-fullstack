@@ -3,14 +3,12 @@ import ReactDOM from 'react-dom';
 import { BrowserRouter as Router, Route, Link, Switch, Redirect } from "react-router-dom";
 import Layout from './Layout';
 import Feed from './Feed';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { fetchLogin, fetchSignUp } from './utils'
 
 import './index.scss';
+//import def from 'ajv/dist/vocabularies/applicator/additionalItems';
 
-const isAuth = (success) => {
-    (success) ? console.log('true') : console.log("false")
-}
 
 const Home = (props) => { 
     const [ loggedIn, setLoggedIn ] = useState(false)
@@ -101,33 +99,11 @@ const Home = (props) => {
     )
 }
 
-const App = () => { 
-    const [ loggedIn, setLoggedIn ] = useState(false)
-    const [ user, setUser ] = useState("Tim")
 
-    const loginCheck = async (status, username) => {
-        await setUser(username)
-        await setLoggedIn(status)
-    }
 
-    return (
-        <Router>
-            <Switch>
-                <Route exact path="/">
-                    {loggedIn ? <Redirect push to="/feed" /> : <Layout><Home changeLoginStatus={loginCheck}/></Layout>} 
-                </Route>
-                <Route path="/feed">
-                    <Feed changeLoginStatus={loginCheck} user={user} />
-                    
-                </Route>
-                <Route path="/*">
-                    <Redirect push to="/" />
-                </Route>
-            </Switch>
-        </Router>
-    );
-}
-
-export default App
+export default FeedApp
 
 //{loggedIn ? <Feed changeLoginStatus={loginCheck} /> : <Redirect push to="/" />} 
+//<Route exact path="/">
+//{loggedIn ? <Redirect push to="/feed" /> : <Layout><Home changeLoginStatus={loginCheck}/></Layout>} 
+//</Route>

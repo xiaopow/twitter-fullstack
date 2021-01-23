@@ -14,5 +14,8 @@
 //
 // const images = require.context('../images', true)
 // const imagePath = (name) => images(name, true)
+import 'jquery/src/jquery'
+import 'popper.js'
+import 'bootstrap/dist/css/bootstrap.min'
+import 'bootstrap/dist/js/bootstrap.min'
 
-import 'bootstrap/dist/css/bootstrap'

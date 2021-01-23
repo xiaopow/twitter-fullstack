@@ -1,28 +1,55 @@
-export async function fetchLogin(method, url, data) {
+import { safeCredentials, handleErrors } from './utils/fetchHelper';
+
+export async function fetchLogin(data) {
 
     const apiRequest = {
-        method: method,
+        method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data)
+        body: JSON.stringify(data),
     }
     
-    return await fetch(url, apiRequest)
+    return await fetch('api/sessions', safeCredentials(apiRequest))
     .then(response => response.json()).then(data => { 
         return data.success
-    }).catch(error => console.log("Error: ", error))
-    
+    }).catch(error => console.log("Error: ", error))   
 }
 
-export async function fetchSignUp(method, url, data) {
+export async function fetchSession() {
 
     const apiRequest = {
-        method: method,
+        method: 'GET',
+        headers: { 'Content-Type': 'application/json' },
+    }
+    
+    return await fetch('api/authenticated', apiRequest)
+    .then(response => response.json()).then(data => { 
+        console.log(data.authenticated)
+        return data
+    }).catch(error => console.log("Error: ", error))   
+}
+export async function destroySession() {
+
+    const apiRequest = {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+    }
+    
+    return await fetch('api/sessions', safeCredentials(apiRequest))
+    .then(response => response).then(data => { 
+        console.log(data)
+    }).catch(error => console.log("Error: ", error))   
+}
+
+export async function fetchSignUp(data) {
+
+    const apiRequest = {
+        method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(data)
     }
     
-    return await fetch(url, apiRequest)
-    .then(response => response.json()).then(data => console.log('Success?: ', data.success)).catch(error => console.log("Error: ", error))
+    return await fetch('api/users', safeCredentials(apiRequest))
+    .then(response => response.json()).then(data => console.log('Success?: ', data.user)).catch(error => console.log("Error: ", error))
     
 }
 

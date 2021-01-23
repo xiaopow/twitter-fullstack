@@ -9,7 +9,6 @@ module Api
           value: session.token,
           httponly: true
         }
-
         render 'sessions/create'
       else
         render json: {

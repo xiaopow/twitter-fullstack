@@ -1,6 +1,5 @@
 Rails.application.routes.draw do
   root 'static_pages#index'
-  get '*path/', to: 'static_pages#index'
   get '/feed'                     => 'static_pages#feed'
   get '/feed/*uri'                 => 'static_pages#feed'
 
