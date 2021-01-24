@@ -53,4 +53,46 @@ export async function fetchSignUp(data) {
     
 }
 
+export async function fetchFeed() {
+
+    const apiRequest = {
+        method: 'GET',
+        headers: { 'Content-Type': 'application/json' },
+    }
+    
+    return await fetch('api/tweets', apiRequest)
+    .then(response => response.json()).then(data => { 
+        console.log(data)
+        return data
+    }).catch(error => console.log("Error: ", error))   
+}
+
+export async function delTweet(id) {
+
+    const url = "api/tweets/" + id
+    const apiRequest = {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+    }
+    
+    return await fetch(url, safeCredentials(apiRequest))
+    .then(response => response.json()).then(data => { 
+        console.log(data.success)
+        return data
+    }).catch(error => console.log("Error: ", error))   
+}
+
+export async function postTweet(data) {
+    const apiRequest = {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data),
+    }
+    
+    return await fetch('api/tweets', safeCredentials(apiRequest))
+    .then(response => handleErrors(response)).then(data => { 
+        console.log(data)
+    }).catch(error => handleErrors(error))   
+}
+
 export default fetchLogin

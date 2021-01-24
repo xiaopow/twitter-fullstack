@@ -100,9 +100,6 @@ const Home = (props) => {
 }
 
 
-
-export default FeedApp
-
 //{loggedIn ? <Feed changeLoginStatus={loginCheck} /> : <Redirect push to="/" />} 
 //<Route exact path="/">
 //{loggedIn ? <Redirect push to="/feed" /> : <Layout><Home changeLoginStatus={loginCheck}/></Layout>} 

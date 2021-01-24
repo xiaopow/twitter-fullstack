@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Route, Link, Switch, Redirect } from "react-router-dom";
 
 import UserFeed from './User';
-import { fetchSession, destroySession } from './utils';
+import { fetchSession, destroySession, fetchFeed, postTweet, delTweet } from './utils';
 import './Feed.scss';
 
 
@@ -12,23 +12,25 @@ const FeedLayout = (props) => {
   const user = props.user 
   const userId = props.userId
   const [ navLink, setNavLink ] = useState("/feed")
-  const [ navLocator, setNavLocator ] = useState(<Link className="nav-link nav-font" to={`/user/${userId}`} onClick={navBtnChg}>{user}</Link>)
-  const [ menuKey, setMenuKey ] = useState(0)
+ // const [ navLocator, setNavLocator ] = useState(<Link className="nav-link nav-font" to={`/user/${userId}`} onClick={navBtnChg}>{user}</Link>)
+  const [ menuKey, setMenuKey ] = useState(user)
   
   const submitLogout = () => {
     props.handleLogout()
   }
   
-  const navBtnChg = () => {
+  const navBtnChg = (e) => {
     const pathname = window.location.pathname
     console.log(window.location.pathname)
-    if (pathname === `/user/${userId}`) {
-      setNavLocator(<Link className="nav-link nav-font" to="/feed" onClick={navBtnChg}>Feed</Link>)
-      setMenuKey(menuKey + 1)
+    if (pathname === `/feed/user/${userId}`) {
+      console.log('wkrs')
+      setMenuKey({user})
+      window.location.replace("/feed")
+      return null
     } else {
-      setNavLocator(<Link className="nav-link nav-font" to={`/user/${userId}`} onClick={navBtnChg}>{user}</Link>)
-      setMenuKey(menuKey + 1)
-
+      setMenuKey("Feed")
+      window.location.replace(`/feed/user/${userId}`)
+      return null
     }
   }
 
@@ -50,7 +52,7 @@ const FeedLayout = (props) => {
         <div className="nav navbar-nav btn-group dropdown">
           <a href="#" className="dropdown-toggle mr-5" data-toggle="dropdown" role="button" aria-expanded="false"><span id="user-icon">{user}</span></a>
           <ul className="dropdown-menu dropdown-menu-right pl-2 mr-auto" id="navMenu" role="menu">
-            <li key={menuKey}>{navLocator}</li>
+            <li><a id="log-out" href="#" onClick={navBtnChg}>{menuKey}</a></li>
             <li role="presentation" className="dropdown-divider"></li>
             <li className><a href="#">Lists</a></li>
             <li role="presentation" className="dropdown-divider"></li>
@@ -71,18 +73,71 @@ const FeedLayout = (props) => {
 export const Feed = (props) => {
   const user = props.user
   const logout = props.logout
+  const [ feedTweets, setFeedTweets ] = useState(null)
+  const [ tweetData, setTweetData ] = useState(null)
   
-  const feedItem = (
-            <div className="tweet col-xs-12">
+
+  useEffect(() => {
+    getFeed()
+  }, [])
+
+
+  const getFeed = async () => {
+    const feedData = await fetchFeed()
+    await setFeedTweets(feedData.tweets)
+    await setTweetData(feedData.tweets)
+  }
+
+  const handleTweet = async (e) => {
+    e.preventDefault()
+    console.log("tweet: ", e.target[0].value)
+    const data = { message: e.target[0].value }
+    await postTweet(data)
+    await getFeed()
+  }
+
+  const deleteTweet = async (e) => {
+    e.preventDefault()
+    console.log("tweet id: ", e.target.id)
+     await delTweet(e.target.id)  
+     await getFeed()
+  }
+
+  const FeedItem = (props) => {
+    const user = props.user
+    const message = props.message
+    const messageId = props.messageId
+
+    return (
+            <div className="tweet col-xs-12" id={`user${userId}`}>
               <a className="tweet-username" href="#">{user}</a>
               <a className="ml-2 tweet-screenName" href="#">@{user}</a>
-              <p className="">This is an amazing tweet</p>
-              <button className="delete-tweet btn bg-primary text-light align-text-top">Delete</button>
+              <p className="">{message}</p>
+              <button className="delete-tweet btn bg-primary text-light align-text-top" onClick={deleteTweet({messageId})}>Delete</button>
             </div>
         )
+  }
+  
+  const loadTweets = () => {
+    if (feedTweets) {    
+      return feedTweets.map((tweet) => {
+        return (
+              <div className="tweet col-xs-12" id={`user${tweet.id}`}>
+              <a className="tweet-username" href="#">{tweet.username}</a>
+              <a className="ml-2 tweet-screenName" href="#">@{tweet.username}</a>
+              <p className="">{tweet.message}</p>
+              <button className="delete-tweet btn bg-primary text-light align-text-top" id={tweet.id} onClick={deleteTweet}>Delete</button>
+            </div>)
+      })
+    } else {
+      return <p>Loading</p>
+    }
+
+
+  }
 
   return (
-    <>
+    <Router>
         <div className="main container">
           <div className="row">
             <div className="col-xs-3 profile-trends">
@@ -130,26 +185,31 @@ export const Feed = (props) => {
               </div>
             </div>
             <div className="col-xs-6 feed-box">
-              <div className="col-xs-12 post-tweet-box">
-                <textarea type="text" className="form-control post-input" rows="3" placeholder="What's happening?"></textarea>
-                <div className="pull-right">
-                  <label id="upload-image-btn" >Upload image</label>
-                  <img className="d-none" id="image-preview" src="" alt="image preview" />
-                  <input type="file" id="image-select" name="image" accept="image/*" />
-                  <span className="post-char-counter">140</span>
-                  <button className="btn btn-primary" disabled id="post-tweet-btn">Tweet</button>
+              <form onSubmit={handleTweet}>
+                <div className="col-xs-12 post-tweet-box" onSubmit>
+                  <textarea type="text" className="form-control post-input" rows="3" placeholder="What's happening?"></textarea>
+                  <div className="pull-right">
+                    <label id="upload-image-btn" >Upload image</label>
+                    <img className="d-none" id="image-preview" src="" alt="image preview" />
+                    <input type="file" id="image-select" name="image" accept="image/*" />
+                    <span className="post-char-counter">140</span>
+                    <button className="btn btn-primary" id="post-tweet-btn">Tweet</button>
+                  </div>
                 </div>
-              </div>
+              </form>
               <div className="feed">
-                {feedItem}
+                <Switch>
+                  <Route path="/feed" exact render={loadTweets} />
+                </Switch>
               </div>
             </div>
             <div className="col-xs-3 follow-suggest">
             </div>
           </div>
         </div> 
-    </>
+    </Router>
   )  
+  
 }
 
 export const FeedApp = () => { 
@@ -190,7 +250,7 @@ export const FeedApp = () => {
     <FeedLayout key={layoutKey} user={user} userId={userId} handleLogout={handleLogout} />
       <Switch>
         <Route path="/feed" exact >{loadFeed}</Route>
-        <Route path={`/user/${userId}`} exact><UserFeed user={user} userId={userId} /></Route>
+        <Route path={`/feed/user/${userId}`} exact><UserFeed user={user} userId={userId} /></Route>
       </Switch>
   </Router>
   )
