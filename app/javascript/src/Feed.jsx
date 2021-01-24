@@ -34,6 +34,10 @@ const FeedLayout = (props) => {
     }
   }
 
+  const search = () => {
+    console.log("search")
+  }
+
   return (
     <nav className="navbar">
         <div className="navbar-header">
@@ -41,14 +45,14 @@ const FeedLayout = (props) => {
             Logo<i className="fa fa-twitter"></i>
           </a>
         </div>
-        <div className="search-bar col-xs-3 nav navbar-right ml-auto mr-4">
-          <div className="input-group">
-            <input type="text" className="form-control search-input" placeholder="Search for..."/>
+        <form className="search-bar col-xs-3 nav navbar-right ml-auto mr-4" onSubmit={search}>
+          <div className="input-group border rounded" id="searchBox">
+            <input type="text" className="form-control search-input" id="searchInput" placeholder="Search for..."/>
             <span className="input-group-btn">
-              <button className="btn btn-default search-btn border rounded-right border-left-0" type="button">Go!</button>
+              <button className="btn btn-default search-btn" id="searchBtn">Go!</button>
             </span>
           </div>
-        </div>
+        </form>
         <div className="nav navbar-nav btn-group dropdown">
           <a href="#" className="dropdown-toggle mr-5" data-toggle="dropdown" role="button" aria-expanded="false"><span id="user-icon">{user}</span></a>
           <ul className="dropdown-menu dropdown-menu-right pl-2 mr-auto" id="navMenu" role="menu">
@@ -92,6 +96,7 @@ export const Feed = (props) => {
     e.preventDefault()
     console.log("tweet: ", e.target[0].value)
     const data = { message: e.target[0].value }
+    e.target[0].value = null
     await postTweet(data)
     await getFeed()
   }
@@ -102,38 +107,30 @@ export const Feed = (props) => {
      await delTweet(e.target.id)  
      await getFeed()
   }
-
-  const FeedItem = (props) => {
-    const user = props.user
-    const message = props.message
-    const messageId = props.messageId
-
-    return (
-            <div className="tweet col-xs-12" id={`user${userId}`}>
-              <a className="tweet-username" href="#">{user}</a>
-              <a className="ml-2 tweet-screenName" href="#">@{user}</a>
-              <p className="">{message}</p>
-              <button className="delete-tweet btn bg-primary text-light align-text-top" onClick={deleteTweet({messageId})}>Delete</button>
-            </div>
-        )
-  }
   
   const loadTweets = () => {
     if (feedTweets) {    
+
       return feedTweets.map((tweet) => {
+        let deleteButton = null
+
+        if (user === tweet.username) {
+          deleteButton = <button className="delete-tweet btn bg-primary text-light ml-auto mt-auto py-1" id={tweet.id} onClick={deleteTweet}>Delete</button>
+        }
+
         return (
               <div className="tweet col-xs-12" id={`user${tweet.id}`}>
-              <a className="tweet-username" href="#">{tweet.username}</a>
-              <a className="ml-2 tweet-screenName" href="#">@{tweet.username}</a>
-              <p className="">{tweet.message}</p>
-              <button className="delete-tweet btn bg-primary text-light align-text-top" id={tweet.id} onClick={deleteTweet}>Delete</button>
-            </div>)
+                <a className="tweet-username" href="#">{tweet.username}</a>
+                <a className="ml-2 tweet-screenName" href="#">@{tweet.username}</a>
+                <div className="d-flex"> 
+                  <p className="pt-2">{tweet.message}</p>
+                  {deleteButton}
+                </div>
+              </div>)
       })
     } else {
       return <p>Loading</p>
     }
-
-
   }
 
   return (
@@ -186,7 +183,7 @@ export const Feed = (props) => {
             </div>
             <div className="col-xs-6 feed-box">
               <form onSubmit={handleTweet}>
-                <div className="col-xs-12 post-tweet-box" onSubmit>
+                <div className="col-xs-12 post-tweet-box">
                   <textarea type="text" className="form-control post-input" rows="3" placeholder="What's happening?"></textarea>
                   <div className="pull-right">
                     <label id="upload-image-btn" >Upload image</label>
