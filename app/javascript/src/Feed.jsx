@@ -115,27 +115,27 @@ export const Feed = (props) => {
 
     const SideBar = () => {
       return (
-        <div className="col-xs-3 profile-trends">
-          <div className="profileCard col-xs-12">
+        <div className="profile-trends">
+          <div className="pl-2 profileCard col-10">
             <div className="profileCard-content">
-              <div className="user-field col-xs-12">
+              <div className="user-field col-10">
                 <Link className="username" to={{ pathname: `/feed/user/${userId}`, state: { user: user }}}>{user}</Link><br/>
                 <Link className="screenName" to={{ pathname: `/feed/user/${userId}`, state: { user: user }}}>@{user}</Link>
               </div>
-              <div className="user-stats">
-                <div className="col-xs-3">
+              <div className="user-stats d-flex flex-row justify-content-around">
+                <div className="flex-item">
                   <a href="">
                     <span>Tweets<br/></span>
                     <span className="user-stats-tweets">{tweetCount}</span>
                   </a>
                 </div>
-                <div className="col-xs-4">
+                <div className="flex-item">
                   <a href="">
                     <span>Following<br/></span>
                     <span className="user-stats-following">0</span>
                   </a>
                 </div>
-                <div className="col-xs-4">
+                <div className="flex-item">
                   <a href="">
                     <span>Followers<br/></span>
                     <span className="user-stats-followers">0</span>
@@ -144,12 +144,12 @@ export const Feed = (props) => {
               </div>
             </div>
           </div>
-          <div className="trends col-xs-12">
-            <div className="col-xs-12">
+          <div className="trends col-10">
+            <div className="">
               <div className="trends-header">
                 <span>Trends</span><span> &#183; </span><small><a href="">Change</a></small>
               </div>
-              <ul className="trends-list">
+              <ul className="trends-list ml-2">
                 <li><a href="#" disabled>#Hongkong</a></li>
                 <li><a href="#" disabled>#Ruby</a></li>
                 <li><a href="#" disabled>#foobarbaz</a></li>
@@ -215,14 +215,13 @@ export const Feed = (props) => {
   return (
     <Router>
       <NavBar logout={props.logout} user={user} />
-        <div className="main container mx-0 mt-0" id="bgImg">
-          
-          <div className="d-flex flex-row">
-            <div className="flex-item col-3 ml-4"><SideBar /></div>
-            <div className="flex-item col-9">
+        <div className="main container my-0 px-0 w-100" id="bgImg">     
+          <div className="d-flex flex-row mx-0">
+            <div className="flex-item ml-4 mr-auto"><SideBar /></div>
+            <div className="flex-item mr-auto">
               <div className="feed-box">
                 <form onSubmit={handleTweet}>
-                  <div className="col-xs-12 post-tweet-box">
+                  <div className="col-10 post-tweet-box">
                     <textarea type="text" className="form-control post-input" rows="3" placeholder="What's happening?"></textarea>
                     <div className="pull-right">
                       <label id="upload-image-btn" >Upload image</label>
@@ -233,7 +232,7 @@ export const Feed = (props) => {
                     </div>
                   </div>
                 </form>
-                <div className="feed">  
+                <div className="feed col-10 mb-5">  
                 <Switch>
                   <Route path="/feed" exact render={loadTweets} />
                   <Route path="/feed/user/:id" exact><UserFeed key={userKey} user={user} userId={userId} isAuth={isAuth} data={userTweetData} delete={deleteTweet} /></Route>
@@ -279,7 +278,8 @@ export const FeedApp = () => {
     setLayoutKey(layoutKey + 1)
   }
 
-  const handleLogout = async () => {
+  const handleLogout = async (e) => {
+      e.preventDefault()
       await destroySession()
       await authenticate()
   }
