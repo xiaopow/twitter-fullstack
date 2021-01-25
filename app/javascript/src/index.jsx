@@ -42,7 +42,7 @@ const Home = (props) => {
 
 
   return ( 
-          <div className="main bg-secondary">
+          <div className="main mt-0 bg-secondary">
               <div className="container">
                   <div className="row">
                       <div className="front-card col-xs-10 col-xs-offset-1">

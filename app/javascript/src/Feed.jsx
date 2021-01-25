@@ -1,11 +1,13 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import { useState, useEffect } from 'react';
-import { BrowserRouter as Router, Route, Link, Switch, Redirect } from "react-router-dom";
+import { BrowserRouter as Router, Route, Link, Switch, Redirect, useHistory, NavLink } from "react-router-dom";
 
 import UserFeed from './User';
 import { fetchSession, destroySession, fetchFeed, postTweet, delTweet, fetchUserTweets } from './utils';
 import './Feed.scss';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faTwitter } from '@fortawesome/free-brands-svg-icons'
 
 //
 //const FeedLayout = (props) => {
@@ -61,11 +63,55 @@ export const Feed = (props) => {
   const [ tweetCount, setTweetCount ] = useState(0)
   const [ userTweetData, setUserTweetData ] = useState(null)
   const [ userKey, setUserKey ] = useState(0)
-  
-
+   
   useEffect(() => {
     getFeed()
   }, [])
+
+
+    const NavBar = (props) => {
+      
+
+      const search = (e) => {
+        e.preventDefault()
+        console.log("search")
+      }
+
+      return(
+        <nav className="navbar">
+          <div className="navbar-header">
+          <Link className="navbar-brand" to="/feed" exact >
+              <FontAwesomeIcon icon={faTwitter} />
+          </Link>
+          </div>
+          <form className="search-bar col-xs-3 nav navbar-right ml-auto mr-4" onSubmit={search}>
+            <div className="input-group border rounded" id="searchBox">
+              <input type="text" className="form-control search-input" id="searchInput" placeholder="Search for..."/>
+              <span className="input-group-btn">
+                <button className="btn btn-default search-btn" id="searchBtn">Go!</button>
+              </span>
+            </div>
+          </form>
+          <div className="nav navbar-nav btn-group dropdown">
+            <a href="#" className="dropdown-toggle mr-5" data-toggle="dropdown" role="button" aria-expanded="false"><span id="user-icon">{user}</span></a>
+            <ul className="dropdown-menu dropdown-menu-right pl-2 mr-auto" id="navMenu" role="menu">
+              <NavLink to="/feed" exact activeClassName="d-none" ><li> All Tweets </li></NavLink>
+              <NavLink to={{ pathname: `/feed/user/${userId}`, state: { user: props.user }}} activeClassName="d-none" ><li >{user}</li></NavLink>
+              <li role="presentation" className="dropdown-divider"></li>
+              <li disabled><a href="#">Lists</a></li>
+              <li role="presentation" className="dropdown-divider"></li>
+              <li disabled><a href="#">Help</a></li>
+              <li role="presentation" className="dropdown-divider"></li>
+              <li disabled><a href="#">Keyboard shortcuts</a></li>
+              <li role="presentation" className="dropdown-divider"></li>
+              <li disabled><a href="#">Settings</a></li>
+              <li role="presentation" className="dropdown-divider"></li>
+              <li ><a id="log-out" href="#" onClick={props.logout}>Log out</a></li>
+            </ul>
+          </div> 
+        </nav>
+     )    
+    }
 
     const SideBar = () => {
       return (
@@ -73,8 +119,8 @@ export const Feed = (props) => {
           <div className="profileCard col-xs-12">
             <div className="profileCard-content">
               <div className="user-field col-xs-12">
-                <Link className="username" to={`/feed/user/${userId}`}>{user}</Link><br/>
-                <Link className="screenName" to={`/feed/user/${userId}`}>@{user}</Link>
+                <Link className="username" to={{ pathname: `/feed/user/${userId}`, state: { user: user }}}>{user}</Link><br/>
+                <Link className="screenName" to={{ pathname: `/feed/user/${userId}`, state: { user: user }}}>@{user}</Link>
               </div>
               <div className="user-stats">
                 <div className="col-xs-3">
@@ -104,11 +150,11 @@ export const Feed = (props) => {
                 <span>Trends</span><span> &#183; </span><small><a href="">Change</a></small>
               </div>
               <ul className="trends-list">
-                <li><a href="#">#Hongkong</a></li>
-                <li><a href="#">#Ruby</a></li>
-                <li><a href="#">#foobarbaz</a></li>
-                <li><a href="#">#rails</a></li>
-                <li><a href="#">#API</a></li>
+                <li><a href="#" disabled>#Hongkong</a></li>
+                <li><a href="#" disabled>#Ruby</a></li>
+                <li><a href="#" disabled>#foobarbaz</a></li>
+                <li><a href="#" disabled>#rails</a></li>
+                <li><a href="#" disabled>#API</a></li>
               </ul>
             </div>
           </div>
@@ -123,7 +169,6 @@ export const Feed = (props) => {
     await setTweetData(feedData.tweets)
     await setUserTweetData(userData.tweets)
     await setTweetCount(userData.tweets.length)
-    await setUserKey(userKey + 1)
   }
 
   const handleTweet = async (e) => {
@@ -154,8 +199,8 @@ export const Feed = (props) => {
 
         return (
               <div className="tweet col-xs-12" key={`user${tweet.id}`}>
-                <a className="tweet-username" href="#">{tweet.username}</a>
-                <a className="ml-2 tweet-screenName" href="#">@{tweet.username}</a>
+                <Link className="tweet-username" to={{ pathname: `/feed/user/${tweet.id}`, state: { user: tweet.username }}}>{tweet.username}</Link>
+                <Link className="ml-2 tweet-screenName" to={{ pathname: `/feed/user/${tweet.id}`, state: { user: tweet.username }}}>@{tweet.username}</Link>
                 <div className="d-flex"> 
                   <p className="pt-2">{tweet.message}</p>
                   {deleteButton}
@@ -169,6 +214,7 @@ export const Feed = (props) => {
 
   return (
     <Router>
+      <NavBar logout={props.logout} user={user} />
         <div className="main container">
           <div className="row">
             <SideBar />
@@ -198,9 +244,10 @@ export const Feed = (props) => {
         </div> 
     </Router>
   )  
-  
 }
 
+
+// MAIN COMPONENT FOR ALL-FEED and USER-FEED
 export const FeedApp = () => { 
   const [ user, setUser ] = useState("User")
   const [ userId, setUserId ] = useState(null)
@@ -208,14 +255,16 @@ export const FeedApp = () => {
   const [ loadFeed, setLoadFeed ] = useState(<small>Authenticating...</small>)
   const [ layoutKey, setLayoutKey ] = useState(0)
   const [ navLink, setNavLink ] = useState(<Link to="/feed" onClick={test}>Feed</Link>)
+  const locHist = useHistory();
 
   useEffect(() => {
     authenticate()
+    console.log(locHist)
   }, [])
 
-  useEffect(() => {
-    loadDropdown()
-  }, [])
+ // useEffect(() => {
+ //   console.log(locHist.location.pathname)
+ // }, [locHist.location.pathname])
 
   const test = (e) => {
     console.log('Link click: ', e)
@@ -245,56 +294,22 @@ export const FeedApp = () => {
      // await loadDropdown(session.username, session.user.id)
       await console.log("Session user: ", session.user.id)
     }
-    await (session.authenticated) ? setLoadFeed(<Feed user={session.username} userId={session.user.id} isAuth={session.authenticated} />) : setLoadFeed(<NoAuth />)
+    await (session.authenticated) ? setLoadFeed(<Feed user={session.username} userId={session.user.id} isAuth={session.authenticated} logout={handleLogout} />) : setLoadFeed(<NoAuth />)
     await setIsAuth(session.authenticated)
-    await setLayoutKey(1)
   }
 
   
-  
-  const search = (e) => {
-    e.preventDefault()
-    console.log("search")
-  }
+
 
   return ( 
   <Router>
-    <nav className="navbar" key={layoutKey}>
-      <div className="navbar-header">
-        <a className="navbar-brand" href="#">
-          Logo<i className="fa fa-twitter"></i>
-        </a>
-      </div>
-      <form className="search-bar col-xs-3 nav navbar-right ml-auto mr-4" onSubmit={search}>
-        <div className="input-group border rounded" id="searchBox">
-          <input type="text" className="form-control search-input" id="searchInput" placeholder="Search for..."/>
-          <span className="input-group-btn">
-            <button className="btn btn-default search-btn" id="searchBtn">Go!</button>
-          </span>
-        </div>
-      </form>
-      <div className="nav navbar-nav btn-group dropdown">
-        <a href="#" className="dropdown-toggle mr-5" data-toggle="dropdown" role="button" aria-expanded="false"><span id="user-icon">{user}</span></a>
-        <ul className="dropdown-menu dropdown-menu-right pl-2 mr-auto" id="navMenu" role="menu">
-          <li >{navLink}</li>
-          <li role="presentation" className="dropdown-divider"></li>
-          <li disabled><a href="#">Lists</a></li>
-          <li role="presentation" className="dropdown-divider"></li>
-          <li disabled><a href="#">Help</a></li>
-          <li role="presentation" className="dropdown-divider"></li>
-          <li disabled><a href="#">Keyboard shortcuts</a></li>
-          <li role="presentation" className="dropdown-divider"></li>
-          <li disabled><a href="#">Settings</a></li>
-          <li role="presentation" className="dropdown-divider"></li>
-          <li ><a id="log-out" href="#" onClick={handleLogout}>Log out</a></li>
-        </ul>
-      </div> 
-    </nav>
     {loadFeed}
   </Router>
   )
 }
 
+
+//RENDERER
 document.addEventListener('DOMContentLoaded', () => {
   ReactDOM.render(
       <React.StrictMode>
