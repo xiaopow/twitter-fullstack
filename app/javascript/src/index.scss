@@ -1,3 +1,11 @@
 #navMenu {
     position: absolute;
 }
+.main {
+    background-image: url('./images/background_1.png');
+    background-size: cover;
+    background-repeat: no-repeat;
+    min-height: 100vh;
+    min-width: 100vw;
+    position: fixed;
+}

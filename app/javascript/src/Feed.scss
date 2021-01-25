@@ -14,3 +14,13 @@
     height: 33px
   }
 
+.main {
+    background-color: #c0deed;
+}
+
+#bgImg {
+    background-image: url('./images/bg.png');
+    background-repeat: no-repeat;
+    min-width: 100vw;
+    position: fixed;
+}

@@ -80,7 +80,7 @@ export const Feed = (props) => {
       return(
         <nav className="navbar">
           <div className="navbar-header">
-          <Link className="navbar-brand" to="/feed" exact >
+          <Link className="navbar-brand ml-5" to="/feed" exact >
               <FontAwesomeIcon icon={faTwitter} />
           </Link>
           </div>
@@ -215,27 +215,30 @@ export const Feed = (props) => {
   return (
     <Router>
       <NavBar logout={props.logout} user={user} />
-        <div className="main container">
-          <div className="row">
-            <SideBar />
-            <div className="col-xs-6 feed-box">
-              <form onSubmit={handleTweet}>
-                <div className="col-xs-12 post-tweet-box">
-                  <textarea type="text" className="form-control post-input" rows="3" placeholder="What's happening?"></textarea>
-                  <div className="pull-right">
-                    <label id="upload-image-btn" >Upload image</label>
-                    <img className="d-none" id="image-preview" src="" alt="image preview" />
-                    <input type="file" id="image-select" name="image" accept="image/*" />
-                    <span className="post-char-counter">140</span>
-                    <button className="btn btn-primary" id="post-tweet-btn">Tweet</button>
+        <div className="main container mx-0 mt-0" id="bgImg">
+          
+          <div className="d-flex flex-row">
+            <div className="flex-item col-3 ml-4"><SideBar /></div>
+            <div className="flex-item col-9">
+              <div className="feed-box">
+                <form onSubmit={handleTweet}>
+                  <div className="col-xs-12 post-tweet-box">
+                    <textarea type="text" className="form-control post-input" rows="3" placeholder="What's happening?"></textarea>
+                    <div className="pull-right">
+                      <label id="upload-image-btn" >Upload image</label>
+                      <img className="d-none" id="image-preview" src="" alt="image preview" />
+                      <input type="file" id="image-select" name="image" accept="image/*" />
+                      <span className="post-char-counter">140</span>
+                      <button className="btn btn-primary" id="post-tweet-btn">Tweet</button>
+                    </div>
                   </div>
+                </form>
+                <div className="feed">  
+                <Switch>
+                  <Route path="/feed" exact render={loadTweets} />
+                  <Route path="/feed/user/:id" exact><UserFeed key={userKey} user={user} userId={userId} isAuth={isAuth} data={userTweetData} delete={deleteTweet} /></Route>
+                </Switch>
                 </div>
-              </form>
-              <div className="feed">  
-              <Switch>
-                <Route path="/feed" exact render={loadTweets} />
-                <Route path="/feed/user/:id" exact><UserFeed key={userKey} user={user} userId={userId} isAuth={isAuth} data={userTweetData} delete={deleteTweet} /></Route>
-              </Switch>
               </div>
             </div>
             <div className="col-xs-3 follow-suggest">

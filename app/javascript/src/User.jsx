@@ -39,8 +39,8 @@ export const UserFeed = (props) => {
 
                 return (
                     <div className="tweet col-xs-12" key={tweet.id}>
-                        <a className="tweet-username" href="#">{tweet.username}</a>
-                        <a className="ml-2 tweet-screenName" href="#">@{tweet.username}</a>
+                        <a className="tweet-username" href="#" disabled>{tweet.username}</a>
+                        <a className="ml-2 tweet-screenName" href="#" disabled>@{tweet.username}</a>
                         <div className="d-flex"> 
                             <p className="pt-2">{tweet.message}</p>
                             {deleteButton}
@@ -49,7 +49,7 @@ export const UserFeed = (props) => {
                 )    
             })
         } else {
-            return <p>Error loading</p>
+            return <p><small>Loading</small></p>
         }
     }
 
