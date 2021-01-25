@@ -9,18 +9,21 @@ import Layout from './Layout';
 const Home = (props) => { 
   const [ loggedIn, setLoggedIn ] = useState(false)
   const [ failedLogin, setFailedLogin ] = useState(null)
+  const [ signupSuccess, setSignupSuccess ] = useState(null)
   
-  const handleSignUp = (e) => {
-      e.preventDefault()
+  const handleSignUp = async (e) => {
+    e.preventDefault()
 
-      const data = { 
-          user: {
-              username: e.target[0].value,
-              password: e.target[2].value,
-              email: e.target[1].value
-              }
-          }
-      fetchSignUp(data)
+    const data = { 
+        user: {
+            username: e.target[0].value,
+            password: e.target[2].value,
+            email: e.target[1].value
+            }
+        }
+    const signup = await fetchSignUp(data)
+    
+    await (signup) ? setSignupSuccess(<div className="ml-3 mb-2 text-success"><small><i>Sign up successful. Please log in above.</i></small></div>) : setSignupSuccess(<div className="ml-3 mb-2 text-danger"><small><i>Sign up error. Please try again.</i></small></div>)
   }    
 
   async function handleLogin(e) {
@@ -72,8 +75,9 @@ const Home = (props) => {
                           <div className="sign-up col-xs-4 col-xs-offset-1">
                               <form onSubmit={handleSignUp}>
                                   <div className="new-to-t">
-                                  <p><strong>New to Twitter?</strong><span> Sign Up</span></p>
+                                    <p><strong>New to Twitter?</strong><span> Sign Up</span></p>
                                   </div>
+                                  {signupSuccess}
                                   <div className="form-group">
                                   <input type="text" className="form-control username" placeholder="Username" />
                                   </div>
