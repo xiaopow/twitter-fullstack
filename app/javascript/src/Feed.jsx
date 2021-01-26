@@ -132,11 +132,13 @@ export const Feed = (props) => {
   // POST new tweet and GET full updated list of all tweets from db
   const handleTweet = async (e) => { 
     e.preventDefault()
-    const data = { message: e.target[0].value }
-    e.target[0].value = null
-    setTweetLength(140)
-    await postTweet(data)
-    await getFeed()
+    if (e.target[0].value) {
+      const data = { message: e.target[0].value }
+      e.target[0].value = null
+      setTweetLength(140)
+      await postTweet(data)
+      await getFeed()
+    }
   }
 
   // DELETE tweet from db; GET updated list of tweets from db

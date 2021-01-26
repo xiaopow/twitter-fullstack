@@ -21,4 +21,6 @@ environment.plugins.prepend('Provide',
   })
 )
 
+environment.splitChunks()
+
 module.exports = environment
