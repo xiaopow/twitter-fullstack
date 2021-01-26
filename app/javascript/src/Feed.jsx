@@ -1,87 +1,42 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import { useState, useEffect } from 'react';
-import { BrowserRouter as Router, Route, Link, Switch, Redirect, useHistory, NavLink } from "react-router-dom";
+import { BrowserRouter as Router, Route, Link, Switch, NavLink } from "react-router-dom";
 
 import UserFeed from './User';
-import { fetchSession, destroySession, fetchFeed, postTweet, delTweet, fetchUserTweets } from './utils';
+import { fetchSession, destroySession, fetchFeed, postTweet, delTweet, fetchUserTweets, ErrorBoundary } from './utils';
 import './Feed.scss';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faTwitter } from '@fortawesome/free-brands-svg-icons'
 
-//
-//const FeedLayout = (props) => {
-//  const user = props.user 
-//  const userId = props.userId
-//  const [ navLink, setNavLink ] = useState(<Link to={`/feed/user/${userId}`} onClick={navBtnChg}>{user}</Link>)
-// // const [ navLocator, setNavLocator ] = useState(<Link className="nav-link nav-font" to={`/user/${userId}`} onClick={navBtnChg}>{user}</Link>)
-//  const [ menuKey, setMenuKey ] = useState(0)
-//  
-//  const submitLogout = () => {
-//    props.handleLogout()
-//  }
-//
-//  useEffect(() => {
-//    navBtnChg()
-//  }, [])
-//
-//
-//  
-//  const navBtnChg = (e) => {
-//    
-//    const pathname = window.location.pathname
-//    console.log(window.location.pathname)
-//    if (pathname === `/feed/user/${userId}`) {
-//      return setNavLink(<Link to="/feed" onClick={navBtnChg}>Feed</Link>)
-//      setMenuKey(menuKey + 1)
-//      //console.log('wkrs')
-//      //setMenuKey({user})
-//      //window.location.replace("/feed")
-//      //return null
-//    } else {
-//      return setNavLink(<Link to={`/feed/user/${userId}`} onClick={navBtnChg}>{user}</Link>)
-//      setMenuKey(menuKey + 1)
-//      //window.location.replace(`/feed/user/${userId}`)
-//      //return null
-//    }
-//  }
-//
-// 
-////<a id="log-out" href="#" onClick={navBtnChg}>{menuKey}</a>
-//
-//  return 
-//}
-//
-
+// PRIMARY FEED Component
 export const Feed = (props) => {
   const user = props.user
   const userId = props.userId
-  const logout = props.logout
-  const isAuth = props.isAuth
   const [ feedTweets, setFeedTweets ] = useState(null)
-  const [ tweetData, setTweetData ] = useState(null)
+  const [ userTweetCount, setUserTweetCount ] = useState(0)
   const [ tweetCount, setTweetCount ] = useState(0)
-  const [ userTweetData, setUserTweetData ] = useState(null)
-  const [ userKey, setUserKey ] = useState(0)
   const [ tweetLength, setTweetLength ] = useState(140)
+  const [ sideUser, setSideUser ] = useState(user)
+  const [ sideUserId, setSideUserId ] = useState(userId)
+
    
   useEffect(() => {
-    getFeed()
+    getFeed() //Fetching all tweets from database on mount
   }, [])
 
-
+    // NAVBAR Component
     const NavBar = (props) => {
-      
-
+      // Placeholder function for Search feature
       const search = (e) => {
         e.preventDefault()
-        console.log("search")
+        console.log("Search placeholder")
       }
 
-      return(
+      return (
         <nav className="navbar">
           <div className="navbar-header">
-          <Link className="navbar-brand ml-5" to="/feed" exact >
+          <Link className="navbar-brand ml-5" to="/feed">
               <FontAwesomeIcon icon={faTwitter} />
           </Link>
           </div>
@@ -96,8 +51,8 @@ export const Feed = (props) => {
           <div className="nav navbar-nav btn-group dropdown">
             <a href="#" className="dropdown-toggle mr-5" data-toggle="dropdown" role="button" aria-expanded="false"><span id="user-icon">{user}</span></a>
             <ul className="dropdown-menu dropdown-menu-right pl-2 mr-auto" id="navMenu" role="menu">
-              <NavLink to="/feed" exact activeClassName="d-none" ><li> All Tweets </li></NavLink>
-              <NavLink to={{ pathname: `/feed/user/${userId}`, state: { user: props.user }}} activeClassName="d-none" ><li >{user}</li></NavLink>
+              <NavLink to="/feed" exact activeClassName="d-none"  ><li> All Tweets </li></NavLink>
+              <NavLink to={{ pathname: `/feed/user/${userId}`, state: { user: props.user, id: userId }}} activeClassName="d-none" ><li >{user}</li></NavLink>
               <li role="presentation" className="dropdown-divider"></li>
               <li disabled><a href="#">Lists</a></li>
               <li role="presentation" className="dropdown-divider"></li>
@@ -114,18 +69,20 @@ export const Feed = (props) => {
      )    
     }
 
+    //SIDEBAR Component
     const SideBar = () => {
+      
       return (
-        <div className="profile-trends">
+        <div className="profile-trends" key={sideUser}>
           <div className="pl-2 profileCard col-10">
             <div className="profileCard-content">
               <div className="user-field col-10">
-                <Link className="username" to={{ pathname: `/feed/user/${userId}`, state: { user: user }}}>{user}</Link><br/>
-                <Link className="screenName" to={{ pathname: `/feed/user/${userId}`, state: { user: user }}}>@{user}</Link>
+                <Link className="username" to={{ pathname: `/feed/user/${sideUserId}`, state: { user: sideUser, id: sideUserId  }}}>{sideUser}</Link><br/>
+                <Link className="screenName" to={{ pathname: `/feed/user/${sideUserId}`, state: { user: sideUser, id: sideUserId  }}}>@{sideUser}</Link>
               </div>
               <div className="user-stats d-flex flex-row justify-content-around">
                 <div className="flex-item">
-                  <a href="">
+                  <a href="" disabled>
                     <span>Tweets<br/></span>
                     <span className="user-stats-tweets">{tweetCount}</span>
                   </a>
@@ -158,23 +115,23 @@ export const Feed = (props) => {
                 <li><a href="#" disabled>#API</a></li>
               </ul>
             </div>
-          </div>
+          </div> 
         </div>
       )
     }
 
+  // GET tweets from db
   const getFeed = async () => {
     const feedData = await fetchFeed()
     const userData = await fetchUserTweets(user)
     await setFeedTweets(feedData.tweets)
-    await setTweetData(feedData.tweets)
-    await setUserTweetData(userData.tweets)
+    await setUserTweetCount(userData.tweets.length)
     await setTweetCount(userData.tweets.length)
   }
 
-  const handleTweet = async (e) => {
+  // POST new tweet and GET full updated list of all tweets from db
+  const handleTweet = async (e) => { 
     e.preventDefault()
-    console.log("tweet: ", e.target[0].value)
     const data = { message: e.target[0].value }
     e.target[0].value = null
     setTweetLength(140)
@@ -182,16 +139,24 @@ export const Feed = (props) => {
     await getFeed()
   }
 
+  // DELETE tweet from db; GET updated list of tweets from db
   const deleteTweet = async (e) => {
     e.preventDefault()
-    console.log("tweet id: ", e.target.id)
      await delTweet(e.target.id)  
      await getFeed()
   }
-  
-  const loadTweets = () => {
-    if (feedTweets) {    
 
+  // Process Tweet Feed
+  const LoadTweets = () => {
+      
+    //Reset SIDEBAR User to Logged-in User on Mount of LoadTweets
+    useEffect(() => { 
+      setSideUser(user)
+      setSideUserId(userId)
+      setTweetCount(userTweetCount)
+    }, [])
+    
+    if (feedTweets) {    
       return feedTweets.map((tweet) => {
         let deleteButton = null
 
@@ -201,8 +166,8 @@ export const Feed = (props) => {
 
         return (
               <div className="tweet col-xs-12" key={`user${tweet.id}`}>
-                <Link className="tweet-username" to={{ pathname: `/feed/user/${tweet.id}`, state: { user: tweet.username }}}>{tweet.username}</Link>
-                <Link className="ml-2 tweet-screenName" to={{ pathname: `/feed/user/${tweet.id}`, state: { user: tweet.username }}}>@{tweet.username}</Link>
+                <Link className="tweet-username" to={{ pathname: `/feed/user/${tweet.id}`, state: { user: tweet.username, id: tweet.id }}}>{tweet.username}</Link>
+                <Link className="ml-2 tweet-screenName" to={{ pathname: `/feed/user/${tweet.id}`, state: { user: tweet.username, id: tweet.id }}}>@{tweet.username}</Link>
                 <div className="d-flex"> 
                   <p className="pt-2">{tweet.message}</p>
                   {deleteButton}
@@ -214,9 +179,17 @@ export const Feed = (props) => {
     }
   }
 
+  // Live count of number of characters in a tweet
   const charCount = (e) => {
     const count = 140 - e.target.value.length
     setTweetLength(count)
+  }
+
+  // Function to Update User displayed on SideBar
+  const handleSideUser = (user, id, count) => {
+    setSideUserId(id)
+    setTweetCount(count)
+    setSideUser(user)
   }
 
   return (
@@ -241,8 +214,8 @@ export const Feed = (props) => {
                 </form>
                 <div className="feed col-10 mb-5">  
                 <Switch>
-                  <Route path="/feed" exact render={loadTweets} />
-                  <Route path="/feed/user/:id" exact><UserFeed key={userKey} user={user} userId={userId} isAuth={isAuth} data={userTweetData} delete={deleteTweet} /></Route>
+                  <Route path="/feed" exact ><LoadTweets/></Route>
+                  <Route path="/feed/user/:id" exact><UserFeed user={user} userId={userId} delete={deleteTweet} handleSideUser={handleSideUser} /></Route>
                 </Switch>
                 </div>
               </div>
@@ -260,32 +233,14 @@ export const Feed = (props) => {
 export const FeedApp = () => { 
   const [ user, setUser ] = useState("User")
   const [ userId, setUserId ] = useState(null)
-  const [ isAuth, setIsAuth ] = useState(false)
   const [ loadFeed, setLoadFeed ] = useState(<small>Authenticating...</small>)
-  const [ layoutKey, setLayoutKey ] = useState(0)
-  const [ navLink, setNavLink ] = useState(<Link to="/feed" onClick={test}>Feed</Link>)
-  const locHist = useHistory();
 
   useEffect(() => {
     authenticate()
-    console.log(locHist)
   }, [])
 
- // useEffect(() => {
- //   console.log(locHist.location.pathname)
- // }, [locHist.location.pathname])
-
-  const test = (e) => {
-    console.log('Link click: ', e)
-  }
-
-  const loadDropdown = () => {
-  
-  //  (e.currentTarget === "/feed") ? setNavLink(<Link to={`/feed/user/${userId}`} onChange={(e) => { console.log('Link click: ', e.currentTarget)}}>{user}</Link>) : setNavLink(<Link to="/feed" onChange={(e) => { console.log('Link click: ', e.currentTarget)}}>Feed</Link>)
-    setLayoutKey(layoutKey + 1)
-  }
-
-  const handleLogout = async (e) => {
+  //LOGOUT function
+   const handleLogout = async (e) => {
       e.preventDefault()
       await destroySession()
       await authenticate()
@@ -296,30 +251,27 @@ export const FeedApp = () => {
     return null
   }
 
+  //LOGIN function
   async function authenticate() {
     const session = await fetchSession()
     if (session.user) {
       await setUser(session.username)
       await setUserId(session.user.id)
-     // await loadDropdown(session.username, session.user.id)
-      await console.log("Session user: ", session.user.id)
     }
-    await (session.authenticated) ? setLoadFeed(<Feed user={session.username} userId={session.user.id} isAuth={session.authenticated} logout={handleLogout} />) : setLoadFeed(<NoAuth />)
-    await setIsAuth(session.authenticated)
+    await (session.authenticated) ? setLoadFeed(<Feed user={session.username} userId={session.user.id} logout={handleLogout} />) : setLoadFeed(<NoAuth />)
   }
 
-  
-
-
   return ( 
-  <Router>
-    {loadFeed}
-  </Router>
+  <ErrorBoundary>
+    <Router>
+      {loadFeed}
+    </Router>
+  </ErrorBoundary>
   )
 }
 
 
-//RENDERER
+//RENDERING
 document.addEventListener('DOMContentLoaded', () => {
   ReactDOM.render(
       <React.StrictMode>

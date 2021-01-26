@@ -1,32 +1,30 @@
 import React from 'react';
-import ReactDOM from 'react-dom';
 import { useState, useEffect } from 'react';
-import { useParams, useHistory } from 'react-router-dom';
-import { fetchSession, destroySession, fetchFeed, postTweet, delTweet, fetchUserTweets } from './utils';
+import { useHistory, Link } from 'react-router-dom';
+import { fetchUserTweets } from './utils';
 
 
 export const UserFeed = (props) => {
-    const { id } = useParams()
     const user = props.user
-    const userId = props.userId
-    //const data = props.data
     const linkState = useHistory()
     const [ data, setData ] = useState(null)
-    const [ userKey, setUserKey ] = useState(0)
     
     useEffect(() => {
         userData()
-    }, [linkState.location.state.user])
+    }, [linkState.location.state.user]) // User Data is retrieved any time there is an update to the user
 
+
+    // GET User Data
     const userData = async () => {
         if (linkState.location.state) {
             const username = linkState.location.state.user
-            console.log(username)
             const userData = await fetchUserTweets(username)
             await setData(userData.tweets)
+            await props.handleSideUser(username, linkState.location.state.id, userData.tweets.length) // Passing state for Side Bar update
         }
     }
 
+    // Process User Feed
     const LoadUserFeed = () => {
         if (data) {
             const dataArr = data
@@ -39,8 +37,8 @@ export const UserFeed = (props) => {
 
                 return (
                     <div className="tweet col-xs-12" key={tweet.id}>
-                        <a className="tweet-username" href="#" disabled>{tweet.username}</a>
-                        <a className="ml-2 tweet-screenName" href="#" disabled>@{tweet.username}</a>
+                        <Link className="tweet-username" to={{ pathname: `/feed/user/${tweet.id}`, state: { user: tweet.username, id: tweet.id }}}>{tweet.username}</Link>
+                        <Link className="ml-2 tweet-screenName" to={{ pathname: `/feed/user/${tweet.id}`, state: { user: tweet.username, id: tweet.id }}}>@{tweet.username}</Link>
                         <div className="d-flex"> 
                             <p className="pt-2">{tweet.message}</p>
                             {deleteButton}
@@ -53,11 +51,7 @@ export const UserFeed = (props) => {
         }
     }
 
-    return (
-        <>
-            <LoadUserFeed key={data} />
-        </>
-    )
+    return <LoadUserFeed key={data} />
 }
 
 export default UserFeed
