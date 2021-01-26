@@ -63,6 +63,7 @@ export const Feed = (props) => {
   const [ tweetCount, setTweetCount ] = useState(0)
   const [ userTweetData, setUserTweetData ] = useState(null)
   const [ userKey, setUserKey ] = useState(0)
+  const [ tweetLength, setTweetLength ] = useState(140)
    
   useEffect(() => {
     getFeed()
@@ -176,6 +177,7 @@ export const Feed = (props) => {
     console.log("tweet: ", e.target[0].value)
     const data = { message: e.target[0].value }
     e.target[0].value = null
+    setTweetLength(140)
     await postTweet(data)
     await getFeed()
   }
@@ -212,6 +214,11 @@ export const Feed = (props) => {
     }
   }
 
+  const charCount = (e) => {
+    const count = 140 - e.target.value.length
+    setTweetLength(count)
+  }
+
   return (
     <Router>
       <NavBar logout={props.logout} user={user} />
@@ -222,12 +229,12 @@ export const Feed = (props) => {
               <div className="feed-box">
                 <form onSubmit={handleTweet}>
                   <div className="col-10 post-tweet-box">
-                    <textarea type="text" className="form-control post-input" rows="3" placeholder="What's happening?"></textarea>
-                    <div className="pull-right">
-                      <label id="upload-image-btn" >Upload image</label>
+                    <textarea type="text" className="form-control post-input" rows="3" onChange={charCount} maxLength="140" placeholder="What's happening?"></textarea>
+                    <div className="d-flex align-items-center">
+                      <label className="ml-auto mb-0" id="upload-image-btn" >Upload image</label>
                       <img className="d-none" id="image-preview" src="" alt="image preview" />
                       <input type="file" id="image-select" name="image" accept="image/*" />
-                      <span className="post-char-counter">140</span>
+                      <span className="post-char-counter ml-1">{tweetLength}</span>
                       <button className="btn btn-primary" id="post-tweet-btn">Tweet</button>
                     </div>
                   </div>
