@@ -6,8 +6,13 @@
     "@fortawesome/free-brands-svg-icons": "^5.15.2",
     "@fortawesome/free-solid-svg-icons": "^5.15.2",
     "@fortawesome/react-fontawesome": "^0.1.14",
+<<<<<<< HEAD
     "@rails/webpacker": "5.2.1",
     "babel-core": "^6.26.3",
+=======
+    "@rails/webpacker": "4.0.7",
+    "babel-loader": "^8.2.2",
+>>>>>>> master
     "babel-plugin-transform-react-remove-prop-types": "^0.4.24",
     "bootstrap": "^4.5.3",
     "jquery": "^3.5.1",
@@ -16,10 +21,9 @@
     "prop-types": "^15.7.2",
     "react": "^17.0.1",
     "react-dom": "^17.0.1",
-    "react-router-dom": "^5.2.0",
-    "webpack": "^5.18.0"
+    "react-router-dom": "^5.2.0"
   },
   "devDependencies": {
-    "webpack-dev-server": "^3.11.2"
+    "webpack-dev-server": "3.7.2"
   }
 }
