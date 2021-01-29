@@ -43,7 +43,7 @@ gem 'aws-sdk', '~> 3.0'
 # Reduces boot times through caching; required in config/boot.rb
 gem 'bootsnap', '>= 1.4.6', require: false
 
-gem 'webpacker'
+gem 'webpacker', '~> 6.0.0.pre.2'
 
 group :development, :test do
   # Call 'byebug' anywhere in the code to stop execution and get a debugger console
