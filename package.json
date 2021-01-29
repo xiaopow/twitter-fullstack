@@ -1,4 +1,9 @@
 {
+  "engines": {
+    "node": "10.23.1",
+    "npm": "6.4.1",
+    "yarn": "1.22.0"
+  },
   "private": true,
   "dependencies": {
     "@babel/core": "^7.12.10",
